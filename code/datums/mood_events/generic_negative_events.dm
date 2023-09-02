@@ -82,6 +82,19 @@
 	mood_change = -10
 	timeout = 8 MINUTES
 
+/datum/mood_event/dismembered/add_effects(obj/item/bodypart/limb)
+	if(limb)
+		description = "AHH! I WAS USING THAT [full_capitalize(limb.plaintext_zone)]"
+
+/datum/mood_event/reattachment
+	description = "Ouch! My limb feels like I fell asleep on it."
+	mood_change = -3
+	timeout = 2 MINUTES
+
+/datum/mood_event/reattachment/add_effects(obj/item/bodypart/limb)
+	if(limb)
+		description = "Ouch! My [limb.plaintext_zone] feels like I fell asleep on it."
+
 /datum/mood_event/tased
 	description = "There's no \"z\" in \"taser\". It's in the zap."
 	mood_change = -3
@@ -127,6 +140,10 @@
 	description = "I should have paid attention to the epilepsy warning."
 	mood_change = -3
 	timeout = 5 MINUTES
+
+/datum/mood_event/photophobia
+	description = "The lights are too bright..."
+	mood_change = -3
 
 /datum/mood_event/nyctophobia
 	description = "It sure is dark around here..."
@@ -369,23 +386,6 @@
 	description = "I hate being sprayed with water!"
 	mood_change = -1
 	timeout = 30 SECONDS
-
-//SKYRAT EDIT START: Mainly surgery for now.
-/datum/mood_event/mild_surgery
-	description = "<span class='warning'>Even if I couldn't feel most of it, it feels wrong being awake while somebody works on your body. Ugh!</span>\n"
-	mood_change = -1
-	timeout = 5 MINUTES
-
-/datum/mood_event/severe_surgery
-	description = "<span class='boldwarning'>Wait, THEY CUT ME OPEN - AND I FELT EVERY SECOND OF IT!</span>\n"
-	mood_change = -4
-	timeout = 15 MINUTES
-
-/datum/mood_event/robot_surgery
-	description = "<span class='warning'>Having my robotic parts messed with while I was conscious felt wrong... if only I had a sleep mode!</span>\n"
-	mood_change = -4
-	timeout = 10 MINUTES
-//SKYRAT EDIT END
 
 /datum/mood_event/gamer_withdrawal
 	description = "I wish I was gaming right now..."

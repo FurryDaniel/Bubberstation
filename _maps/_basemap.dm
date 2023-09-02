@@ -2,8 +2,6 @@
 
 #include "map_files\generic\CentCom.dmm"
 
-#include "map_files\generic\CentCom_skyrat_z2.dmm" //SKYRAT EDIT ADDITION - SMMS
-
 #ifndef LOWMEMORYMODE
 	#ifdef ALL_MAPS
 		#include "map_files\Birdshot\birdshot.dmm"
@@ -18,6 +16,10 @@
 		// SKYRAT EDIT ADDITON START - Compiling our modular maps too!
 		#include "map_files\VoidRaptor\VoidRaptor.dmm"
 		// SKYRAT EDIT END
+		// BUBBER EDIT ADDITION START
+		#include "map_files\biodome\biodome.dmm"
+		#include "map_files\LimaStation\LimaStation.dmm"
+		// BUBBER EDIT ADDITION END
 
 		#ifdef CIBUILDING
 			#include "templates.dm"

@@ -20,7 +20,7 @@
 ///The gun needs to update the gun hud!
 #define COMSIG_UPDATE_AMMO_HUD "update_ammo_hud"
 
-/// Used by /obj/item/melee/hammer
+/// Used by /obj/item/melee/breaching_hammer
 #define COMSIG_BREACHING "breaching_signal_woop_woop"
 ///The gun has jammed.
 #define COMSIG_GUN_JAMMED "gun_jammed"
@@ -36,6 +36,9 @@
 	#define COMPONENT_POWER_SUCCESS (1<<0)
 	#define COMPONENT_NO_CELL  (1<<1)
 	#define COMPONENT_NO_CHARGE (1<<2)
+
+/// Sent when supermatter begins its delam countdown/when the suppression system is triggered: (var/trigger_reason)
+#define COMSIG_MAIN_SM_DELAMINATING "delam_time"
 
 // Health signals
 /// /mob/living/proc/updatehealth()
@@ -59,6 +62,9 @@
 ///from base of /obj/effect/abstract/liquid_turf/Initialize() (/obj/effect/abstract/liquid_turf/liquids)
 #define COMSIG_TURF_LIQUIDS_CREATION "turf_liquids_creation"
 
+/// listens to wet_stacks, if wetting a mob above 10 stacks it will signal the akula race trait to apply its buffs and nerfs
+#define COMSIG_MOB_TRIGGER_WET_SKIN "mob_trigger_wet_skin"
+
 //when someone casts their fishing rod
 #define COMSIG_START_FISHING "start_fishing"
 //when someone pulls back their fishing rod
@@ -67,6 +73,13 @@
 /// From mob/living/*/set_combat_mode(): (new_state)
 #define COMSIG_LIVING_COMBAT_MODE_TOGGLE "living_combat_mode_toggle"
 
+/// From /obj/item/organ/internal/stomach/after_eat(atom/edible)
+#define COMSIG_STOMACH_AFTER_EAT "stomach_after_eat"
+
+/// For when a Hemophage's pulsating tumor gets added to their body.
+#define COMSIG_PULSATING_TUMOR_ADDED "pulsating_tumor_added"
+/// For when a Hemophage's pulsating tumor gets removed from their body.
+#define COMSIG_PULSATING_TUMOR_REMOVED "pulsating_tumor_removed"
 
 /// when someone attempts to evolve through the rune
 #define COMSIG_RUNE_EVOLUTION "rune_evolution"

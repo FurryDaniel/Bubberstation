@@ -33,6 +33,15 @@
 /// One can breath under water, you get me?
 #define TRAIT_WATER_BREATHING "water_breathing"
 
+/// The trait which Akulas inherit, for their species mechanic revolving around wet_stacks
+#define TRAIT_SLICK_SKIN "slick_skin"
+/// The trait which is applied when a `slick skin` trait haver actually gets wet_stacks
+#define TRAIT_SLIPPERY "slippery"
+/// The minimum amount of tiles a TRAIT_SLIPPERY haver will slide on slip
+#define SLIPPERY_MIN 5
+/// The maximum amount of tiles a TRAIT_SLIPPERY haver will slide on slip
+#define SLIPPERY_MAX 9
+
 /// Under the effect of a numbling agent, such as morphine, for surgery.
 #define TRAIT_NUMBED "numbed"
 
@@ -75,3 +84,9 @@
 
 /// Trait that is applied whenever someone or something is glassblowing
 #define TRAIT_CURRENTLY_GLASSBLOWING "currently_glassblowing"
+
+/// Trait that was granted by a NIFSoft
+#define NIFSOFT_TRAIT "nifsoft"
+
+/// Trait given to a piece of eyewear that allows the user to use NIFSoft HUDs
+#define TRAIT_NIFSOFT_HUD_GRANTER "nifsoft_hud_granter"

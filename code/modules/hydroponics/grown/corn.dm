@@ -10,7 +10,7 @@
 	potency = 20
 	instability = 50 //Corn used to be wheatgrass, before being cultivated for generations.
 	growthstages = 3
-	growing_icon = 'icons/obj/hydroponics/growing_vegetables.dmi'
+	growing_icon = 'icons/obj/service/hydroponics/growing_vegetables.dmi'
 	icon_grow = "corn-grow" // Uses one growth icons set for all the subtypes
 	icon_dead = "corn-dead" // Same for the dead icon
 	mutatelist = list(/obj/item/seeds/corn/snapcorn)
@@ -36,6 +36,7 @@
 	AddElement(/datum/element/microwavable, /obj/item/food/popcorn)
 
 /obj/item/grown/corncob
+	seed = /obj/item/seeds/corn
 	name = "corn cob"
 	desc = "A reminder of meals gone by."
 	icon_state = "corncob"
@@ -89,5 +90,10 @@
 		user.put_in_hands(S)
 	snap_pops -= 1
 	if(!snap_pops)
-		new /obj/item/grown/corncob(user.loc)
+		new /obj/item/grown/corncob/snap(user.loc)
 		qdel(src)
+
+/obj/item/grown/corncob/snap
+	seed = /obj/item/seeds/corn/snapcorn
+	name = "snap corn cob"
+	desc = "A reminder of pranks gone by."

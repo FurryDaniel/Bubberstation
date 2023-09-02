@@ -60,24 +60,28 @@ GLOBAL_LIST_INIT(loadout_exosuits, generate_loadout_items(/datum/loadout_item/su
 *	SUITS / SUIT JACKETS
 */
 
+/datum/loadout_item/suit/recolorable
+	name = "Recolorable Formal Suit Jacket"
+	item_path = /obj/item/clothing/suit/toggle/lawyer/greyscale
+
 /datum/loadout_item/suit/black_suit_jacket
-	name = "Black Suit Jacket"
+	name = "Black Formal Suit Jacket"
 	item_path = /obj/item/clothing/suit/toggle/lawyer/black
 
 /datum/loadout_item/suit/blue_suit_jacket
-	name = "Blue Suit Jacket"
+	name = "Blue Formal Suit Jacket"
 	item_path = /obj/item/clothing/suit/toggle/lawyer
 
 /datum/loadout_item/suit/purple_suit_jacket
-	name = "Purple Suit Jacket"
+	name = "Purple Formal Suit Jacket"
 	item_path = /obj/item/clothing/suit/toggle/lawyer/purple
 
 /datum/loadout_item/suit/white_suit_jacket
-	name = "White Suit Jacket"
+	name = "White Formal Suit Jacket"
 	item_path = /obj/item/clothing/suit/toggle/lawyer/white
 
 /datum/loadout_item/suit/suitblackbetter
-	name = "Light Black Suit Jacket"
+	name = "Light Black Formal Suit Jacket"
 	item_path = /obj/item/clothing/suit/toggle/lawyer/black/better
 
 /datum/loadout_item/suit/suitwhite
@@ -279,20 +283,12 @@ GLOBAL_LIST_INIT(loadout_exosuits, generate_loadout_items(/datum/loadout_item/su
 *	MISC
 */
 
-/datum/loadout_item/suit/purple_apron
-	name = "Purple Apron"
-	item_path = /obj/item/clothing/suit/apron/purple_bartender
-
 /datum/loadout_item/suit/recolorable_apron
 	name = "Recolorable Apron"
 	item_path = /obj/item/clothing/suit/apron/chef/colorable_apron
 
 /datum/loadout_item/suit/recolorable_overalls
 	name = "Recolorable Overalls"
-	item_path = /obj/item/clothing/suit/apron/overalls/greyscale
-
-/datum/loadout_item/suit/denim_overalls
-	name = "Denim Overalls"
 	item_path = /obj/item/clothing/suit/apron/overalls
 
 /datum/loadout_item/suit/redhood
@@ -326,6 +322,10 @@ GLOBAL_LIST_INIT(loadout_exosuits, generate_loadout_items(/datum/loadout_item/su
 /*
 *	FLANNELS
 */
+
+/datum/loadout_item/suit/flannel_gags
+	name = "Flannel Shirt"
+	item_path = /obj/item/clothing/suit/toggle/jacket/flannel/gags
 
 /datum/loadout_item/suit/flannel_black
 	name = "Black Flannel"
@@ -557,7 +557,7 @@ GLOBAL_LIST_INIT(loadout_exosuits, generate_loadout_items(/datum/loadout_item/su
 /datum/loadout_item/suit/navybluejacketofficer
 	name = "Security Officer's Navy Blue Formal Jacket"
 	item_path = /obj/item/clothing/suit/jacket/officer/blue
-	restricted_roles = list(JOB_SECURITY_OFFICER, JOB_HEAD_OF_SECURITY, JOB_WARDEN) // I aint making a medic one, maybe i'll add some rank thing from cm or civ for it
+	restricted_roles = list(JOB_SECURITY_OFFICER, JOB_HEAD_OF_SECURITY, JOB_SECURITY_MEDIC, JOB_WARDEN) //BUBBER EDIT
 
 /datum/loadout_item/suit/navybluejacketwarden
 	name = "Warden's Navy Blue Formal Jacket"
@@ -572,12 +572,12 @@ GLOBAL_LIST_INIT(loadout_exosuits, generate_loadout_items(/datum/loadout_item/su
 /datum/loadout_item/suit/security_jacket
 	name = "Security Jacket"
 	item_path = /obj/item/clothing/suit/toggle/jacket/sec
-	restricted_roles = list(JOB_HEAD_OF_SECURITY, JOB_SECURITY_OFFICER, JOB_WARDEN, JOB_DETECTIVE) //Not giving this one to COs because it's actually better than the one they spawn with
+	restricted_roles = list(JOB_HEAD_OF_SECURITY, JOB_SECURITY_OFFICER, JOB_SECURITY_MEDIC, JOB_WARDEN, JOB_DETECTIVE) //BUBBER EDIT
 
 /datum/loadout_item/suit/brit
 	name = "High Vis Armored Vest"
 	item_path = /obj/item/clothing/suit/armor/vest/peacekeeper/brit
-	restricted_roles = list(JOB_HEAD_OF_SECURITY, JOB_SECURITY_OFFICER, JOB_WARDEN, JOB_DETECTIVE, JOB_CORRECTIONS_OFFICER)
+	restricted_roles = list(JOB_HEAD_OF_SECURITY, JOB_SECURITY_OFFICER, JOB_SECURITY_MEDIC, JOB_WARDEN, JOB_DETECTIVE, JOB_CORRECTIONS_OFFICER) //BUBBER EDIT
 
 /datum/loadout_item/suit/british_jacket
 	name = "Peacekeeper Officer Coat"
@@ -613,11 +613,21 @@ GLOBAL_LIST_INIT(loadout_exosuits, generate_loadout_items(/datum/loadout_item/su
 	item_path = /obj/item/clothing/suit/gorka/supply
 	restricted_roles = list(JOB_QUARTERMASTER, JOB_CARGO_TECHNICIAN, JOB_SHAFT_MINER, JOB_CUSTOMS_AGENT)
 
+/datum/loadout_item/suit/cargo_gorka_jacket
+	name = "Cargo Gorka Jacket"
+	item_path = /obj/item/clothing/suit/toggle/cargo_tech
+	restricted_roles = list(JOB_QUARTERMASTER, JOB_CARGO_TECHNICIAN, JOB_SHAFT_MINER, JOB_CUSTOMS_AGENT)
+
+/datum/loadout_item/suit/qm_jacket
+	name = "Quartermaster's Overcoat"
+	item_path = /obj/item/clothing/suit/jacket/quartermaster
+	restricted_roles = list(JOB_QUARTERMASTER)
+
 // LABCOATS
 /datum/loadout_item/suit/labcoat_highvis
 	name = "High-Vis Labcoat"
 	item_path = /obj/item/clothing/suit/toggle/labcoat/skyrat/highvis
-	restricted_roles = list(JOB_CHIEF_MEDICAL_OFFICER, JOB_PARAMEDIC, JOB_ATMOSPHERIC_TECHNICIAN, JOB_DETECTIVE, JOB_CHEMIST, JOB_ORDERLY) // And now chemist and orderly get it too.
+	restricted_roles = list(JOB_CHIEF_MEDICAL_OFFICER, JOB_PARAMEDIC, JOB_ATMOSPHERIC_TECHNICIAN, JOB_SECURITY_MEDIC, JOB_DETECTIVE, JOB_CHEMIST, JOB_ORDERLY) //BUBBER EDIT
 
 /*
 *	FAMILIES

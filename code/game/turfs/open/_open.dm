@@ -279,6 +279,14 @@
 		// Stops sliding
 		slide_distance = 0
 
+	// SKYRAT EDIT START - Akula species
+	if(HAS_TRAIT(slipper, TRAIT_SLIPPERY))
+		if(!(lube & SLIDE_ICE))
+			lube |= SLIDE
+
+		slide_distance = rand(SLIPPERY_MIN, SLIPPERY_MAX)
+	// SKYRAT EDIT END
+
 	var/obj/buckled_obj
 	if(slipper.buckled)
 		if(!(lube & GALOSHES_DONT_HELP)) //can't slip while buckled unless it's lube.
@@ -287,7 +295,7 @@
 	else
 		if(!(lube & SLIP_WHEN_CRAWLING) && (slipper.body_position == LYING_DOWN || !(slipper.status_flags & CANKNOCKDOWN))) // can't slip unbuckled mob if they're lying or can't fall.
 			return FALSE
-		if(slipper.m_intent == MOVE_INTENT_WALK && (lube & NO_SLIP_WHEN_WALKING))
+		if(slipper.move_intent == MOVE_INTENT_WALK && (lube & NO_SLIP_WHEN_WALKING))
 			return FALSE
 
 	if(!(lube & SLIDE_ICE))

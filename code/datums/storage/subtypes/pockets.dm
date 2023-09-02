@@ -103,9 +103,12 @@
 		/obj/item/toy/crayon,
 		/obj/item/reagent_containers/cup/glass/flask),
 		list(/obj/item/screwdriver/power,
-		/obj/item/ammo_casing/caseless/rocket,
+		/obj/item/ammo_casing/rocket,
 		/obj/item/clothing/mask/cigarette/pipe,
-		/obj/item/toy/crayon/spraycan)
+		/obj/item/toy/crayon/spraycan, // BUBBER EDIT ADDITION
+		/obj/item/seeds, // BUBBER EDIT ADDITION
+		/obj/item/card, // BUBBER EDIT ADDITION
+		)
 		)
 
 /datum/storage/pockets/shoes/clown/New()
@@ -138,9 +141,12 @@
 		/obj/item/bikehorn,
 		/obj/item/reagent_containers/cup/glass/flask),
 		list(/obj/item/screwdriver/power,
-		/obj/item/ammo_casing/caseless/rocket,
+		/obj/item/ammo_casing/rocket,
 		/obj/item/clothing/mask/cigarette/pipe,
-		/obj/item/toy/crayon/spraycan)
+		/obj/item/toy/crayon/spraycan, // BUBBER EDIT ADDITION
+		/obj/item/seeds, // BUBBER EDIT ADDITION
+		/obj/item/card, // BUBBER EDIT ADDITION
+		)
 		)
 
 /datum/storage/pockets/pocketprotector
@@ -167,7 +173,7 @@
 	set_holdable(list(/obj/item/reagent_containers/cup/glass/bottle/vodka,
 					  /obj/item/reagent_containers/cup/glass/bottle/molotov,
 					  /obj/item/reagent_containers/cup/glass/drinkingglass,
-					  /obj/item/ammo_box/a762))
+					  /obj/item/ammo_box/strilka310))
 
 
 /datum/storage/pockets/void_cloak
@@ -178,7 +184,7 @@
 /datum/storage/pockets/void_cloak/New()
 	. = ..()
 	set_holdable(list(
-		/obj/item/ammo_box/a762/lionhunter,
+		/obj/item/ammo_box/strilka310/lionhunter,
 		/obj/item/bodypart, // Bodyparts are often used in rituals. They're also often normal sized, so you can only fit one.
 		/obj/item/clothing/neck/eldritch_amulet,
 		/obj/item/clothing/neck/heretic_focus,

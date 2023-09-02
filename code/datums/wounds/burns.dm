@@ -43,7 +43,7 @@
 		return
 
 	if(victim.reagents)
-		if(victim.reagents.has_reagent(/datum/reagent/medicine/spaceacillin))
+		if(HAS_TRAIT(victim, TRAIT_VIRUS_RESISTANCE))
 			sanitization += 0.9
 		if(victim.reagents.has_reagent(/datum/reagent/space_cleaner/sterilizine/))
 			sanitization += 0.9
@@ -130,11 +130,11 @@
 						var/datum/brain_trauma/severe/paralysis/sepsis = new (limb.body_zone)
 						victim.gain_trauma(sepsis)
 
-/datum/wound/burn/get_examine_description(mob/user)
+/datum/wound/burn/get_wound_description(mob/user)
 	if(strikes_to_lose_limb <= 0)
-		return span_deadsay("<B>[victim.p_their(TRUE)] [limb.plaintext_zone] has locked up completely and is non-functional.</B>")
+		return span_deadsay("<B>[victim.p_Their()] [limb.plaintext_zone] has locked up completely and is non-functional.</B>")
 
-	var/list/condition = list("[victim.p_their(TRUE)] [limb.plaintext_zone] [examine_desc]")
+	var/list/condition = list("[victim.p_Their()] [limb.plaintext_zone] [examine_desc]")
 	if(limb.current_gauze)
 		var/bandage_condition
 		switch(limb.current_gauze.absorption_capacity)
@@ -157,16 +157,16 @@
 			if(WOUND_INFECTION_CRITICAL to WOUND_INFECTION_SEPTIC)
 				condition += ", [span_deadsay("with streaks of rotten infection!")]"
 			if(WOUND_INFECTION_SEPTIC to INFINITY)
-				return span_deadsay("<B>[victim.p_their(TRUE)] [limb.plaintext_zone] is a mess of charred skin and infected rot!</B>")
+				return span_deadsay("<B>[victim.p_Their()] [limb.plaintext_zone] is a mess of charred skin and infected rot!</B>")
 			else
 				condition += "!"
 
 	return "<B>[condition.Join()]</B>"
 
 /datum/wound/burn/get_scanner_description(mob/user)
-	if(strikes_to_lose_limb == 0)
+	if(strikes_to_lose_limb <= 0) // Unclear if it can go below 0, best to not take the chance
 		var/oopsie = "Type: [name]\nSeverity: [severity_text()]"
-		oopsie += "<div class='ml-3'>Infection Level: [span_deadsay("The body part has suffered complete sepsis and must be removed. Amputate or augment limb immediately.")]</div>"
+		oopsie += "<div class='ml-3'>Infection Level: [span_deadsay("The body part has suffered complete sepsis and must be removed. Amputate or augment limb immediately, or place the patient in a cryotube.")]</div>"
 		return oopsie
 
 	. = ..()
@@ -258,6 +258,9 @@
 /datum/wound/burn/on_synthflesh(amount)
 	flesh_healing += amount * 0.5 // 20u patch will heal 10 flesh standard
 
+/datum/wound/burn/get_limb_examine_description()
+	return span_warning("The flesh on this limb appears badly cooked.")
+
 // we don't even care about first degree burns, straight to second
 /datum/wound/burn/moderate
 	name = "Second Degree Burns"
@@ -276,7 +279,7 @@
 /datum/wound/burn/severe
 	name = "Third Degree Burns"
 	desc = "Patient is suffering extreme burns with full skin penetration, creating serious risk of infection and greatly reduced limb integrity."
-	treat_text = "Recommended immediate disinfection and excision of any infected skin, followed by bandaging and ointment."
+	treat_text = "Recommended immediate disinfection and excision of any infected skin, followed by bandaging and ointment. If the limb has locked up, it must be amputated, augmented or treated with cryogenics."
 	examine_desc = "appears seriously charred, with aggressive red splotches"
 	occur_text = "chars rapidly, exposing ruined tissue and spreading angry red burns"
 	severity = WOUND_SEVERITY_SEVERE
@@ -292,7 +295,7 @@
 /datum/wound/burn/critical
 	name = "Catastrophic Burns"
 	desc = "Patient is suffering near complete loss of tissue and significantly charred muscle and bone, creating life-threatening risk of infection and negligible limb integrity."
-	treat_text = "Immediate surgical debriding of any infected skin, followed by potent tissue regeneration formula and bandaging."
+	treat_text = "Immediate surgical debriding of any infected skin, followed by potent tissue regeneration formula and bandaging. If the limb has locked up, it must be amputated, augmented or treated with cryogenics."
 	examine_desc = "is a ruined mess of blanched bone, melted fat, and charred tissue"
 	occur_text = "vaporizes as flesh, bone, and fat melt together in a horrifying mess"
 	severity = WOUND_SEVERITY_CRITICAL
@@ -312,4 +315,14 @@
 	desc = "Patient is suffering extreme burns from a strange brand marking, creating serious risk of infection and greatly reduced limb integrity."
 	examine_desc = "appears to have holy symbols painfully branded into their flesh, leaving severe burns."
 	occur_text = "chars rapidly into a strange pattern of holy symbols, burned into the flesh."
+
+/// special severe wound caused by the cursed slot machine.
+/datum/wound/burn/severe/cursed_brand
+	name = "Ancient Brand"
+	desc  = "Patient is suffering extreme burns with oddly ornate brand markings, creating serious risk of infection and greatly reduced limb integrity."
+	examine_desc = "appears to have ornate symbols painfully branded into their flesh, leaving severe burns"
+	occur_text = "chars rapidly into a pattern that can only be described as an agglomeration of several financial symbols, burned into the flesh"
+
+/datum/wound/burn/severe/cursed_brand/get_limb_examine_description()
+	return span_warning("The flesh on this limb has several ornate symbols burned into it, with pitting throughout.")
 */

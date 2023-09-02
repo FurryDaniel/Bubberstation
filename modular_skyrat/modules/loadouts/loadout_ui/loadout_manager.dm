@@ -20,10 +20,6 @@
 	var/view_job_clothes = TRUE
 	/// Our currently open greyscaling menu.
 	var/datum/greyscale_modify_menu/menu
-	/// Whether we need to update our dummy sprite next ui_data or not.
-	var/update_dummysprite = TRUE
-	/// Our preview sprite.
-	var/icon/dummysprite
 
 /datum/loadout_manager/Destroy(force, ...)
 	owner = null
@@ -100,6 +96,7 @@
 
 		if("display_restrictions")
 			display_job_restrictions(interacted_item)
+			display_species_restrictions(interacted_item)
 
 		// Clears the loadout list entirely.
 		if("clear_all_items")
@@ -168,7 +165,7 @@
 		allowed_configs += "[initial(colored_item.greyscale_config_inhand_right)]"
 
 	var/slot_starting_colors = initial(colored_item.greyscale_colors)
-	if(INFO_GREYSCALE in owner.prefs.loadout_list[colored_item])
+	if((colored_item in owner.prefs.loadout_list) && (INFO_GREYSCALE in owner.prefs.loadout_list[colored_item]))
 		slot_starting_colors = owner.prefs.loadout_list[colored_item][INFO_GREYSCALE]
 
 	menu = new(
@@ -179,6 +176,7 @@
 		starting_icon_state = initial(colored_item.icon_state),
 		starting_config = initial(colored_item.greyscale_config),
 		starting_colors = slot_starting_colors,
+		unlocked = TRUE,
 	)
 	RegisterSignal(menu, COMSIG_PREQDELETED, TYPE_PROC_REF(/datum/loadout_manager, cleanup_greyscale_menu))
 	menu.ui_interact(usr)
@@ -195,6 +193,9 @@
 	if(!open_menu)
 		CRASH("set_slot_greyscale called without a greyscale menu!")
 
+	if(isnull(owner))
+		CRASH("set_slot_greyscale called without an owner!")
+
 	if(!(path in owner.prefs.loadout_list))
 		to_chat(owner, span_warning("Select the item before attempting to apply greyscale to it!"))
 		return
@@ -202,7 +203,7 @@
 	var/list/colors = open_menu.split_colors
 	if(colors)
 		owner.prefs.loadout_list[path][INFO_GREYSCALE] = colors.Join("")
-		update_dummysprite = TRUE
+		owner.prefs?.character_preview_view.update_body()
 
 /// Set [item]'s name to input provided.
 /datum/loadout_manager/proc/set_item_name(datum/loadout_item/item)
@@ -225,12 +226,23 @@
 			owner.prefs.loadout_list[item.item_path] -= INFO_NAMED
 
 /datum/loadout_manager/proc/display_job_restrictions(datum/loadout_item/item)
+	if(!length(item.restricted_roles))
+		return
 	var/composed_message = span_boldnotice("The [initial(item.item_path.name)] is restricted to the following roles: <br>")
 	for(var/job_type in item.restricted_roles)
 		composed_message += span_green("[job_type] <br>")
 
 	to_chat(owner, examine_block(composed_message))
 
+/// If only a certain species is allowed to equip this loadout item, display which
+/datum/loadout_manager/proc/display_species_restrictions(datum/loadout_item/item)
+	if(!length(item.restricted_species))
+		return
+	var/composed_message = span_boldnotice("\The [initial(item.item_path.name)] is restricted to the following species: <br>")
+	for(var/species_type in item.restricted_species)
+		composed_message += span_green("[species_type] <br>")
+
+	to_chat(owner, examine_block(composed_message))
 
 /// Rotate the dummy [DIR] direction, or reset it to SOUTH dir if we're showing all dirs at once.
 /datum/loadout_manager/proc/rotate_model_dir(dir)
@@ -330,6 +342,7 @@
 		formatted_item["is_greyscale"] = !!(initial(loadout_atom.greyscale_config) && initial(loadout_atom.greyscale_colors) && (initial(loadout_atom.flags_1) & IS_PLAYER_COLORABLE_1))
 		formatted_item["is_renamable"] = item.can_be_named
 		formatted_item["is_job_restricted"] = !isnull(item.restricted_roles)
+		formatted_item["is_species_restricted"] = !isnull(item.restricted_species)
 		formatted_item["is_donator_only"] = !isnull(item.donator_only)
 		formatted_item["is_ckey_whitelisted"] = !isnull(item.ckeywhitelist)
 		if(LAZYLEN(item.additional_tooltip_contents))

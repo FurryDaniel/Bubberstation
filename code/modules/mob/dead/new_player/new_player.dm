@@ -1,3 +1,5 @@
+///Cooldown for the Reset Lobby Menu HUD verb
+#define RESET_HUD_INTERVAL 15 SECONDS
 /mob/dead/new_player
 	flags_1 = NONE
 	invisibility = INVISIBILITY_ABSTRACT
@@ -15,7 +17,8 @@
 	var/ineligible_for_roles = FALSE
 	/// Used to track if the player's jobs menu sent a message saying it successfully mounted.
 	var/jobs_menu_mounted = FALSE
-
+	///Cooldown for the Reset Lobby Menu HUD verb
+	COOLDOWN_DECLARE(reset_hud_cooldown)
 
 /mob/dead/new_player/Initialize(mapload)
 	if(client && SSticker.state == GAME_STATE_STARTUP)
@@ -30,6 +33,7 @@
 	. = ..()
 
 	GLOB.new_player_list += src
+	add_verb(src, /mob/dead/new_player/proc/reset_menu_hud)
 
 /mob/dead/new_player/Destroy()
 	GLOB.new_player_list -= src
@@ -131,6 +135,8 @@
 		//SKYRAT EDIT END
 		if(JOB_UNAVAILABLE_ANTAG_INCOMPAT)
 			return "[jobtitle] is not compatible with some antagonist role assigned to you."
+		if(JOB_UNAVAILABLE_AGE)
+			return "Your character is not old enough for [jobtitle]."
 
 	return GENERIC_JOB_UNAVAILABLE_ERROR
 
@@ -159,7 +165,7 @@
 		return JOB_UNAVAILABLE_LANGUAGE
 	if(job.has_banned_quirk(client.prefs))
 		return JOB_UNAVAILABLE_QUIRK
-	if(job.veteran_only && !is_veteran_player(client))
+	if(job.veteran_only && !SSplayer_ranks.is_veteran(client))
 		return JOB_NOT_VETERAN
 	if(job.has_banned_species(client.prefs))
 		return JOB_UNAVAILABLE_SPECIES
@@ -261,8 +267,6 @@
 
 	log_manifest(character.mind.key,character.mind,character,latejoin = TRUE)
 
-	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_CREWMEMBER_JOINED, character, rank)
-
 	// SKYRAT EDIT ADDITION START
 	if(humanc)
 		for(var/datum/loadout_item/item as anything in loadout_list_to_datums(humanc?.client?.prefs?.loadout_list))
@@ -292,9 +296,11 @@
 
 
 	if(!isAI(spawning_mob)) // Unfortunately there's still snowflake AI code out there.
-		mind.original_character_slot_index = client.prefs.default_slot
-		mind.transfer_to(spawning_mob) //won't transfer key since the mind is not active
-		mind.set_original_character(spawning_mob)
+		// transfer_to sets mind to null
+		var/datum/mind/preserved_mind = mind
+		preserved_mind.original_character_slot_index = client.prefs.default_slot
+		preserved_mind.transfer_to(spawning_mob) //won't transfer key since the mind is not active
+		preserved_mind.set_original_character(spawning_mob)
 	client.init_verbs()
 	. = spawning_mob
 	new_character = .
@@ -379,3 +385,21 @@
 	// Add verb for re-opening the interview panel, fixing chat and re-init the verbs for the stat panel
 	add_verb(src, /mob/dead/new_player/proc/open_interview)
 	add_verb(client, /client/verb/fix_tgui_panel)
+
+///Resets the Lobby Menu HUD, recreating and reassigning it to the new player
+/mob/dead/new_player/proc/reset_menu_hud()
+	set name = "Reset Lobby Menu HUD"
+	set category = "OOC"
+	var/mob/dead/new_player/new_player = usr
+	if(!COOLDOWN_FINISHED(new_player, reset_hud_cooldown))
+		to_chat(new_player, span_warning("You must wait <b>[DisplayTimeText(COOLDOWN_TIMELEFT(new_player, reset_hud_cooldown))]</b> before resetting the Lobby Menu HUD again!"))
+		return
+	if(!new_player?.client)
+		return
+	COOLDOWN_START(new_player, reset_hud_cooldown, RESET_HUD_INTERVAL)
+	qdel(new_player.hud_used)
+	create_mob_hud()
+	to_chat(new_player, span_info("Lobby Menu HUD reset. You may reset the HUD again in <b>[DisplayTimeText(RESET_HUD_INTERVAL)]</b>."))
+	hud_used.show_hud(hud_used.hud_version)
+
+#undef RESET_HUD_INTERVAL

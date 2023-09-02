@@ -4,6 +4,10 @@
 /datum/outfit/player_loadout
 	name = "Player Loadout"
 
+/datum/outfit/player_loadout/equip(mob/living/carbon/human/user, visualsOnly)
+	. = ..()
+	user.equip_outfit_and_loadout(new /datum/outfit(), user.client.prefs)
+
 /*
  * Actually equip our mob with our job outfit and our loadout items.
  * Loadout items override the pre-existing item in the corresponding slot of the job outfit.
@@ -44,6 +48,11 @@
 					to_chat(src, span_warning("You were unable to get a loadout item([initial(item.item_path.name)]) due to job restrictions!"))
 				continue
 
+			if(item.restricted_species && !(dna.species.id in item.restricted_species))
+				if(client)
+					to_chat(src, span_warning("You were unable to get a loadout item ([initial(item.item_path.name)]) due to species restrictions!"))
+				continue
+
 			new item.item_path(briefcase)
 
 		briefcase.name = "[preference_source.read_preference(/datum/preference/name/real_name)]'s travel suitcase"
@@ -54,6 +63,11 @@
 			if(item.restricted_roles && equipping_job && !(equipping_job.title in item.restricted_roles))
 				if(client)
 					to_chat(src, span_warning("You were unable to get a loadout item([initial(item.item_path.name)]) due to job restrictions!"))
+				continue
+
+			if(item.restricted_species && !(dna.species.id in item.restricted_species))
+				if(client)
+					to_chat(src, span_warning("You were unable to get a loadout item ([initial(item.item_path.name)]) due to species restrictions!"))
 				continue
 
 			// Make sure the item is not overriding an important for life outfit item

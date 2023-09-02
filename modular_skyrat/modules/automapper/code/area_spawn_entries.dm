@@ -1,6 +1,6 @@
 // Pets
 /datum/area_spawn/markus
-	target_areas = list(/area/station/cargo/sorting,  /area/station/cargo/storage, /area/station/cargo/office, /area/station/command/heads_quarters/qm)
+	target_areas = list(/area/station/cargo/sorting, /area/station/cargo/storage, /area/station/cargo/office, /area/station/command/heads_quarters/qm)
 	desired_atom = /mob/living/basic/pet/dog/markus
 
 /datum/area_spawn/bumbles
@@ -16,6 +16,10 @@
 	desired_atom = /mob/living/simple_animal/pet/poppy
 
 // Structures
+/datum/area_spawn/secmed_locker
+	target_areas = list(/area/station/security/medical, /area/station/security/lockers)
+	desired_atom = /obj/structure/closet/secure_closet/security_medic
+
 /datum/area_spawn/blueshield_locker
 	target_areas = list(/area/station/command/heads_quarters/captain, /area/station/command/bridge, /area/station/command/corporate_dock, /area/station/command/meeting_room, /area/station/command/gateway)
 	desired_atom = /obj/structure/closet/secure_closet/blueshield

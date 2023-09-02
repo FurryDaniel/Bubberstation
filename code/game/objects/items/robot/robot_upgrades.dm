@@ -4,7 +4,7 @@
 /obj/item/borg/upgrade
 	name = "borg upgrade module."
 	desc = "Protected by FRM."
-	icon = 'icons/obj/module.dmi'
+	icon = 'icons/obj/assemblies/module.dmi'
 	icon_state = "cyborg_upgrade"
 	w_class = WEIGHT_CLASS_SMALL
 	var/locked = FALSE
@@ -103,6 +103,32 @@
 	. = ..()
 	if (.)
 		R.ionpulse = FALSE
+
+//BUBBER EDIT Re-added removed upgrade, Plasma cutter
+/obj/item/borg/upgrade/advcutter
+	name = "mining cyborg advanced plasma cutter"
+	desc = "An upgrade for the mining cyborgs plasma cutter, bringing it to advanced operation."
+	icon_state = "cyborg_upgrade3"
+	require_model = TRUE
+	model_type = list(/obj/item/robot_model/miner)
+	model_flags = BORG_MODEL_MINER
+
+/obj/item/borg/upgrade/advcutter/action(mob/living/silicon/robot/R, user = usr)
+	. = ..()
+	if(.)
+		var/obj/item/gun/energy/plasmacutter/brg/AC = locate() in R.model.modules
+		if(AC)
+			to_chat(user, span_warning("This unit is already equipped with A plasma Cutter!"))
+			return FALSE
+		AC = new(R.model)
+		R.model.basic_modules += AC
+		R.model.add_module(AC, FALSE, TRUE)
+
+/obj/item/borg/upgrade/advcutter/deactivate(mob/living/silicon/robot/R, user = usr)
+	. = ..()
+	if (.)
+		for(var/obj/item/gun/energy/plasmacutter/brg/AC in R.model.modules)
+			R.model.remove_module(AC, TRUE)
 
 /obj/item/borg/upgrade/ddrill
 	name = "mining cyborg diamond drill"
@@ -267,9 +293,9 @@
 
 /obj/item/borg/upgrade/lavaproof
 	name = "mining cyborg lavaproof chassis"
-	desc = "An upgrade kit to apply specialized coolant systems and insulation layers to a mining cyborg's chassis, enabling them to withstand exposure to molten rock."
+	desc = "An upgrade kit to apply specialized coolant systems and insulation layers to a mining cyborg's chassis, enabling them to withstand exposure to molten rock and liquid plasma."
 	icon_state = "ash_plating"
-	resistance_flags = LAVA_PROOF | FIRE_PROOF
+	resistance_flags = LAVA_PROOF | FIRE_PROOF | FREEZE_PROOF
 	require_model = TRUE
 	model_type = list(/obj/item/robot_model/miner)
 	model_flags = BORG_MODEL_MINER
@@ -277,12 +303,12 @@
 /obj/item/borg/upgrade/lavaproof/action(mob/living/silicon/robot/R, user = usr)
 	. = ..()
 	if(.)
-		ADD_TRAIT(R, TRAIT_LAVA_IMMUNE, type)
+		R.add_traits(list(TRAIT_LAVA_IMMUNE, TRAIT_SNOWSTORM_IMMUNE), type)
 
 /obj/item/borg/upgrade/lavaproof/deactivate(mob/living/silicon/robot/R, user = usr)
 	. = ..()
 	if (.)
-		REMOVE_TRAIT(R, TRAIT_LAVA_IMMUNE, type)
+		R.remove_traits(list(TRAIT_LAVA_IMMUNE, TRAIT_SNOWSTORM_IMMUNE), type)
 
 /obj/item/borg/upgrade/selfrepair
 	name = "self-repair module"
@@ -504,15 +530,27 @@
 /obj/item/borg/upgrade/processor/action(mob/living/silicon/robot/R, user = usr)
 	. = ..()
 	if(.)
-		var/obj/item/surgical_processor/SP = new(R.model)
+		var/obj/item/surgical_processor/SP = locate() in R.model.modules // BUBBER EDIT added duiplication prevention
+		if(SP)
+			to_chat(user, span_warning("This unit is already equipped with A Surgical Processor!!"))
+			return FALSE
+
+		SP = new(R.model)
 		R.model.basic_modules += SP
 		R.model.add_module(SP, FALSE, TRUE)
+
+		for(var/obj/item/surgical_drapes/SD in R.model)// BUBBER EDIT Removes Surgical Drapes when processor is installed
+			R.model.remove_module(SD, TRUE)
 
 /obj/item/borg/upgrade/processor/deactivate(mob/living/silicon/robot/R, user = usr)
 	. = ..()
 	if (.)
 		var/obj/item/surgical_processor/SP = locate() in R.model
 		R.model.remove_module(SP, TRUE)
+
+		var/obj/item/surgical_drapes/SD = new (R.model) // BUBBER EDIT  Adds Surgical Drapes when Surgical Processor removed
+		R.model.basic_modules += SD
+		R.model.add_module(SD, FALSE, TRUE)
 
 /obj/item/borg/upgrade/ai
 	name = "B.O.R.I.S. module"
@@ -550,14 +588,15 @@
 		if(robot.hasExpanded)
 			to_chat(usr, span_warning("This unit already has an expand module installed!"))
 			return FALSE
-		// SKYRAT EDIT BEGIN
+/* 		// SKYRAT EDIT BEGIN - BUBBER EDIT REMOVAL
 		if(robot.model.model_select_icon == "nomod")
 			to_chat(usr, span_warning("Default models cannot take expand or shrink upgrades."))
 			return FALSE
 		if((R_TRAIT_WIDE in robot.model.model_features) || (R_TRAIT_TALL in robot.model.model_features))
 			to_chat(usr, span_warning("This unit's chassis cannot be enlarged any further."))
-			return FALSE
-		// SKYRAT EDIT END
+			return FALSE*/
+		// SKYRAT EDIT END - BUBBER EDIT REMOVAL
+
 
 		robot.notransform = TRUE
 		var/prev_lockcharge = robot.lockcharge
@@ -599,7 +638,7 @@
 	. = ..()
 	if(.)
 
-		var/obj/item/storage/part_replacer/cyborg/RPED = locate() in R
+		var/obj/item/storage/part_replacer/bluespace/RPED = locate() in R.model.modules// BUBBER EDIT changed cyborg to the word bluespace and duplication protection
 		if(RPED)
 			to_chat(user, span_warning("This unit is already equipped with a RPED module!"))
 			return FALSE
@@ -611,7 +650,7 @@
 /obj/item/borg/upgrade/rped/deactivate(mob/living/silicon/robot/R, user = usr)
 	. = ..()
 	if (.)
-		var/obj/item/storage/part_replacer/cyborg/RPED = locate() in R.model
+		var/obj/item/storage/part_replacer/bluespace/RPED = locate() in R.model // BUBBER EDIT changed cyborg to the word bluespace
 		if (RPED)
 			R.model.remove_module(RPED, TRUE)
 
@@ -659,6 +698,7 @@
 
 /datum/action/item_action/crew_monitor
 	name = "Interface With Crew Monitor"
+	button_icon =  "scanner"
 
 /obj/item/borg/upgrade/transform
 	name = "borg model picker (Standard)"
@@ -703,6 +743,41 @@
 		var/obj/item/borg/apparatus/circuit/C = locate() in R.model.modules
 		if (C)
 			R.model.remove_module(C, TRUE)
+
+	//BUBBER EDIT Cyborg welding tool upgrade, electrical
+/obj/item/borg/upgrade/electric_welder
+	name = "Electrical Welding Tool"
+	desc = "An engineering cyborg upgrade no longer using fossil fuels, but rather power!."
+	icon_state = "cyborg_upgrade1"
+	require_model = TRUE
+	model_type = list(/obj/item/robot_model/engineering, /obj/item/robot_model/saboteur)
+	model_flags = BORG_MODEL_ENGINEERING
+
+/obj/item/borg/upgrade/electric_welder/action(mob/living/silicon/robot/R, user = usr)
+	. = ..()
+	if(.)
+		var/obj/item/weldingtool/electric/ET = locate() in R.model.modules
+		if(ET)
+			to_chat(user, span_warning("This unit is already equipped with a Electrical welder!"))
+			return FALSE
+
+		ET= new(R.model)
+		R.model.basic_modules += ET
+		R.model.add_module(ET, FALSE, TRUE)
+
+		for(var/obj/item/weldingtool/largetank/cyborg/OW in R.model)//  Removes orginal welding tool when installed
+			R.model.remove_module(OW, TRUE)
+
+/obj/item/borg/upgrade/electric_welder/deactivate(mob/living/silicon/robot/R, user = usr)
+	. = ..()
+	if (.)
+		var/obj/item/weldingtool/electric/ET = locate() in R.model.modules
+		if (ET)
+			R.model.remove_module(ET, TRUE)
+
+			var/obj/item/weldingtool/largetank/cyborg/OW = new (R.model) //  Adds Orginal welder when Upgrade removed
+			R.model.basic_modules += OW
+			R.model.add_module(OW, FALSE, TRUE)
 
 /obj/item/borg/upgrade/beaker_app
 	name = "beaker storage apparatus"
@@ -871,13 +946,41 @@
 	if (rtable)
 		install.model.remove_module(rtable, TRUE)
 
+/obj/item/borg/upgrade/service_cookbook
+	name = "Service Cyborg Cookbook"
+	desc = "An upgrade to the service model cyborg, that lets them create more foods."
+	icon_state = "cyborg_upgrade3"
+	require_model = TRUE
+	model_type = list(/obj/item/robot_model/service)
+	model_flags = BORG_MODEL_SERVICE
+
+/obj/item/borg/upgrade/service_cookbook/action(mob/living/silicon/robot/install, user = usr)
+	. = ..()
+	if(!.)
+		return FALSE
+	var/obj/item/borg/cookbook/book = locate() in install.model.modules
+	if(book)
+		install.balloon_alert_to_viewers("already installed!")
+		return FALSE
+	book = new(install.model)
+	install.model.basic_modules += book
+	install.model.add_module(book, FALSE, TRUE)
+
+/obj/item/borg/upgrade/service_cookbook/deactivate(mob/living/silicon/robot/install, user = usr)
+	. = ..()
+	if (!.)
+		return FALSE
+	var/obj/item/borg/cookbook/book = locate() in install.model.modules
+	if(book)
+		install.model.remove_module(book, TRUE)
+
 ///This isn't an upgrade or part of the same path, but I'm gonna just stick it here because it's a tool used on cyborgs.
 //A reusable tool that can bring borgs back to life. They gotta be repaired first, though.
 /obj/item/borg_restart_board
 	name = "cyborg emergency reboot module"
 	desc = "A reusable firmware reset tool that can force a reboot of a disabled-but-repaired cyborg, bringing it back online."
 	w_class = WEIGHT_CLASS_SMALL
-	icon = 'icons/obj/module.dmi'
+	icon = 'icons/obj/assemblies/module.dmi'
 	icon_state = "cyborg_upgrade1"
 
 /obj/item/borg_restart_board/pre_attack(mob/living/silicon/robot/borgo, mob/living/user, params)

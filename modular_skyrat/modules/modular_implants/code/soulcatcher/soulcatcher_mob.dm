@@ -21,6 +21,8 @@
 	var/able_to_emote = TRUE
 	/// Is the soul able to speak inside the soulcatcher room?
 	var/able_to_speak = TRUE
+	/// Is the soul able to change their own name?
+	var/able_to_rename = TRUE
 
 	/// Is the soul able to leave the soulcatcher?
 	var/able_to_leave = TRUE
@@ -39,6 +41,11 @@
 
 	var/datum/action/innate/leave_soulcatcher/leave_action = new
 	leave_action.Grant(src)
+
+	var/datum/action/innate/soulcatcher_user/soulcatcher_action = new
+	soulcatcher_action.Grant(src)
+	var/datum/component/soulcatcher_user/user_component = AddComponent(/datum/component/soulcatcher_user)
+	soulcatcher_action.soulcatcher_user_component = WEAKREF(user_component)
 
 /// Toggles whether or not the soul inside the soulcatcher can see the outside world. Returns the state of the `outside_sight` variable.
 /mob/living/soulcatcher_soul/proc/toggle_sight()
@@ -60,6 +67,21 @@
 
 	return outside_hearing
 
+/// Changes the soul's name based off `new_name`. Returns `TRUE` if the name has been changed, otherwise returns `FALSE`.
+/mob/living/soulcatcher_soul/proc/change_name(new_name)
+	if(!new_name || (round_participant && body_scan_needed))
+		return FALSE
+
+	name = new_name
+	return TRUE
+
+/// Attempts to reset the soul's name to it's name in prefs. Returns `TRUE` if the name is reset, otherwise returns `FALSE`.
+/mob/living/soulcatcher_soul/proc/reset_name()
+	if(!mind?.name || change_name(mind.name))
+		return FALSE
+
+	return TRUE
+
 /// Checks if the mob wants to leave the soulcatcher. If they do and are able to leave, they are booted out.
 /mob/living/soulcatcher_soul/verb/leave_soulcatcher()
 	set name = "Leave Soulcatcher"
@@ -75,10 +97,12 @@
 	if(tgui_alert(src, "Are you really sure about this?", "Soulcatcher", list("Yes", "No")) != "Yes")
 		return FALSE
 
+	return_to_body()
 	qdel(src)
 
 /mob/living/soulcatcher_soul/ghost()
 	. = ..()
+	return_to_body()
 	qdel(src)
 
 /mob/living/soulcatcher_soul/say(message, bubble_type, list/spans, sanitize, datum/language/language, ignore_spam, forced, filterproof, message_range, datum/saymode/saymode)
@@ -133,6 +157,21 @@
 	set hidden = TRUE
 	return FALSE
 
+/// Assuming we have a previous body a present mind on our soul, we are going to transfer the mind back to the old body.
+/mob/living/soulcatcher_soul/proc/return_to_body()
+	if(!previous_body || !mind)
+		return FALSE
+
+	var/mob/target_body = previous_body.resolve()
+	if(!target_body)
+		return FALSE
+
+	mind.transfer_to(target_body)
+	SEND_SIGNAL(target_body, COMSIG_SOULCATCHER_CHECK_SOUL, FALSE)
+
+	if(target_body.stat != DEAD)
+		target_body.grab_ghost(TRUE)
+
 /mob/living/soulcatcher_soul/Destroy()
 	log_message("[key_name(src)] has exited a soulcatcher.", LOG_GAME)
 	if(current_room)
@@ -141,17 +180,6 @@
 			room.current_souls -= src
 
 		current_room = null
-
-	if(previous_body && mind)
-		var/mob/target_body = previous_body.resolve()
-		if(!target_body)
-			return FALSE
-
-		mind.transfer_to(target_body)
-		SEND_SIGNAL(target_body, COMSIG_SOULCATCHER_CHECK_SOUL, FALSE)
-
-		if(target_body.stat != DEAD)
-			target_body.grab_ghost(TRUE)
 
 	return ..()
 
@@ -172,3 +200,20 @@
 		return FALSE
 
 	parent_soul.leave_soulcatcher()
+
+/datum/action/innate/soulcatcher_user
+	name = "Soulcatcher"
+	background_icon = 'modular_skyrat/master_files/icons/mob/actions/action_backgrounds.dmi'
+	background_icon_state = "android"
+	button_icon = 'modular_skyrat/master_files/icons/mob/actions/actions_nif.dmi'
+	button_icon_state = "soulcatcher"
+	/// What soulcatcher user component are we bringing up the menu for?
+	var/datum/weakref/soulcatcher_user_component
+
+/datum/action/innate/soulcatcher_user/Activate()
+	. = ..()
+	var/datum/component/soulcatcher_user/user_component = soulcatcher_user_component.resolve()
+	if(!user_component)
+		return FALSE
+
+	user_component.ui_interact(owner)
